@@ -1,8 +1,11 @@
 void setup() {
-    Serial.begin(115200);
+  // put your setup code here, to run once:
+  Serial.begin(115200);
 }
 
 void loop() {
+  // put your main code here, to run repeatedly:
+  delay(5000);
   Serial.println("left$$5$$60");
   Serial.println("#");
   delay(5000);

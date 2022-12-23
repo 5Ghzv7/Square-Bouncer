@@ -1,12 +1,12 @@
 import serial
 import serial.tools.list_ports as stlp
+import time
 
 class Ard:
     # Connects the Arduino
     def __init__(self) -> None:
         # Initializing variables
         self.arduino_connected = True
-        self.arduino_data_none = True
         self.arduino_data = []
         
         # Detecting Arduino
@@ -29,6 +29,7 @@ class Ard:
             print("Arduino NOT connected!")
 
     def getData(self) -> bool:
+        time.sleep(1)
         # Gets Information from "block_detection\detector.ino"
         while True:
             dataPacket = self.arduinoSerial.readline()
@@ -40,5 +41,3 @@ class Ard:
                 dataPacket[1] = int(dataPacket[1])
                 dataPacket[2] = float(dataPacket[2])
                 self.arduino_data = dataPacket
-                self.arduino_data_none = False
-            else: self.arduino_data_none = True

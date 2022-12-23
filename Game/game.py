@@ -12,12 +12,12 @@ class Player(pygame.sprite.Sprite):
     def __init__(self) -> None:
         super().__init__()
         self.image = pygame.image.load(r"Game\img\player\player.png").convert_alpha()
-        self.rect = self.image.get_rect(center=(display_width-100, display_height-100))
+        self.rect = self.image.get_rect(center=(random.randint(300, display_width-300), random.randint(200, display_height-200)))
         
-        self.dx = random.choice((-2, 2))
-        self.dy = random.choice((-3, -2, 2, 3))
+        rand_xy = random.choice((2, -2))
+        self.dx, self.dy = rand_xy, rand_xy
 
-    def update(self) -> None:       
+    def update(self) -> None:
         # ?
         self.wallBouncing()
         
@@ -32,6 +32,13 @@ class Player(pygame.sprite.Sprite):
             score += 1
             change_goal_state = True
             
+        if pygame.sprite.groupcollide(player, square, False, False, pygame.sprite.collide_rect_ratio(0.75)):
+            self.bufferscore = score
+            if self.bufferscore+2 == score:
+                rand_xy = random.choice((2, -2))
+                self.dx, self.dy = rand_xy, rand_xy
+                self.collMovement()
+            
     def wallBouncing(self) -> None:
         self.rect.x += self.dx
         self.rect.y += self.dy
@@ -44,10 +51,10 @@ class Player(pygame.sprite.Sprite):
     def collMovement(self) -> None:
         self.rect.x -= self.dx
         self.dx *= -1
-        self.dx += random.choice((0, 1))
+        self.dx += 1 #random.choice((0, 1))
         self.rect.y -= self.dy
         self.dy *= -1
-        self.dy += random.choice((0, 1))
+        self.dy += 1 #random.choice((0, 1))
 
 class Square(pygame.sprite.Sprite):
     def __init__(self, lane: str, plot: int, sq_angle: float) -> None:
@@ -90,6 +97,7 @@ def displayScore() -> None:
     screen.blit(source=score2_surf, dest=score2_rect)
     
 def displayTimePlayed() -> None:
+    global current_time
     current_time = pygame.time.get_ticks()//1000 - start_time
     text_surf = data_font.render("Time Played:", True, "#ffffff")
     text_rect = text_surf.get_rect(center=(display_width/2, display_height-100))
@@ -125,6 +133,7 @@ if __name__ == "__main__":
     change_goal_state = False
     game_active = False
     start_time = 0
+    current_time = 0
     score = 0
     
     # Arduino initialization
@@ -132,10 +141,10 @@ if __name__ == "__main__":
     
     # Bg Music
     bg_music = pygame.mixer.Sound(abs_path + r"\Game\music\Beginning 2.mp3")
-    bg_music.set_volume(0) #0.5
+    bg_music.set_volume(0.5) #0.5
     bg_music.play(loops=(-1))
     bg_music_G = pygame.mixer.Sound(abs_path + r"\Game\music\Wait.mp3")
-    bg_music_G.set_volume(0) #0.5
+    bg_music_G.set_volume(0.5) #0.5
 
     #Intro Screen Assets
     logo_img = pygame.image.load(abs_path + r"\Game\img\player\_player.png").convert_alpha()
@@ -170,12 +179,15 @@ if __name__ == "__main__":
                         startArdgetDatathread.daemon = True
                         startArdgetDatathread.start()
                         
-                        time.sleep(1)
-                        
                         # Asset initialization
                         player.add(Player())
-                        goal.add(Goal(coords=(random.randint(400, display_width-400), random.randint(250, display_height-250))))
-                        square.add(Square(lane=Ard.arduino_data[0], plot=Ard.arduino_data[1], sq_angle=Ard.arduino_data[2]))
+                        goal.add(Goal(coords=(random.randint(300, display_width-300), random.randint(200, display_height-200))))
+                        if Ard.arduino_data:
+                            square.add(Square(lane=Ard.arduino_data[0], plot=Ard.arduino_data[1], sq_angle=Ard.arduino_data[2]))
+                            Ard.arduino_data.clear()
+                        
+                        exit_text = italicD_font.render("Press 'Esc' key to return to home screen", True, "#fe6b31")
+                        exit_text_rect = exit_text.get_rect(center=(display_width/2, display_height/10))
                         
                         # Start Timer
                         start_time = pygame.time.get_ticks()//1000
@@ -187,6 +199,13 @@ if __name__ == "__main__":
                         
             if intro_state: 
                 if event.type == pygame.KEYDOWN: intro_state = False
+            
+            if game_active:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    game_active = False
+                    intro_state = True
+                    bg_music_G.stop()
+                    bg_music.play()
                                             
         # Main Game
         if game_active:                        
@@ -203,16 +222,18 @@ if __name__ == "__main__":
             # Display info
             displayTimePlayed()
             displayScore()
+            screen.blit(source=exit_text, dest=exit_text_rect)
             
             # Changing Square State
-            if Ard.arduino_data_none:
+            if Ard.arduino_data:
                 square.empty()
                 square.add(Square(lane=Ard.arduino_data[0], plot=Ard.arduino_data[1], sq_angle=Ard.arduino_data[2]))
+                Ard.arduino_data.clear()
             
             # Chaning Goal state
             if change_goal_state:
                 goal.empty()
-                goal.add(Goal(coords=(random.randint(400, display_width-400), random.randint(250, display_height-250))))
+                goal.add(Goal(coords=(random.randint(400, display_width-400), random.randint(200, display_height-200))))
                 change_goal_state = False
                 
         # Intro Screen
