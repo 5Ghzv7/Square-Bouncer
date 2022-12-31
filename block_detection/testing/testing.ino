@@ -17,7 +17,7 @@ void loop() {
         Serial.print(i);
         Serial.print("\n");
         Serial.println("#");
-        delay(1000);
+        delay(20000);
       case 2:
         randplot = random(5);
         Serial.print("right$$");
@@ -26,7 +26,7 @@ void loop() {
         Serial.print(i);
         Serial.print("\n");
         Serial.println("#");
-        delay(1000);
+        delay(20000);
     }
   }
 }
