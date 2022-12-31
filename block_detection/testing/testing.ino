@@ -5,41 +5,28 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  delay(5000);
-  Serial.println("left$$5$$60");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("left$$4$$120");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("left$$3$$180");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("left$$2$$240");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("left$$1$$300");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("left$$0$$360");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("right$$5$$60");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("right$$4$$120");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("right$$3$$180");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("right$$2$$240");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("right$$1$$300");
-  Serial.println("#");
-  delay(5000);
-  Serial.println("right$$0$$360");
-  Serial.println("#");
-  delay(5000);
+  for (int i = 0; i<=360 ; i++) {
+    int rand = random(1, 2);
+    int randplot;
+    switch (rand) {
+      case 1:
+        randplot = random(5);
+        Serial.print("left$$");
+        Serial.print(randplot);
+        Serial.print("$$");
+        Serial.print(i);
+        Serial.print("\n");
+        Serial.println("#");
+        delay(1000);
+      case 2:
+        randplot = random(5);
+        Serial.print("right$$");
+        Serial.print(randplot);
+        Serial.print("$$");
+        Serial.print(i);
+        Serial.print("\n");
+        Serial.println("#");
+        delay(1000);
+    }
+  }
 }

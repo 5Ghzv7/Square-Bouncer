@@ -1,6 +1,5 @@
 import pygame
 import sys
-sys.dont_write_bytecode = True
 import pathlib
 import random
 import threading as th
@@ -11,14 +10,16 @@ import arduinoConfig as ardC
 class Player(pygame.sprite.Sprite):
     def __init__(self) -> None:
         super().__init__()
-        self.image = pygame.image.load(r"Game\img\player\player.png").convert_alpha()
-        self.rect = self.image.get_rect(center=(random.randint(300, display_width-300), random.randint(200, display_height-200)))
+        self.image = pygame.image.load(abs_path + r"\Game\img\player\player.png").convert_alpha()
+        self.rect = self.image.get_rect(center=(random.uniform(display_width/6.4, display_width-(display_width/6.4)), random.uniform(display_height/5.4, display_height-(display_height/5.4))))
         
         rand_xy = random.choice((2, -2))
         self.dx, self.dy = rand_xy, rand_xy
 
     def update(self) -> None:
-        # ?
+        # Player movement
+        self.rect.x += self.dx
+        self.rect.y += self.dy
         self.wallBouncing()
         
         # Collision and Score updating
@@ -40,9 +41,6 @@ class Player(pygame.sprite.Sprite):
                 self.collMovement()
             
     def wallBouncing(self) -> None:
-        self.rect.x += self.dx
-        self.rect.y += self.dy
-
         if self.rect.top < 0: self.dy *= -1
         if self.rect.bottom > display_height: self.dy *= -1
         if self.rect.left < 0: self.dx *= -1
@@ -51,48 +49,45 @@ class Player(pygame.sprite.Sprite):
     def collMovement(self) -> None:
         self.rect.x -= self.dx
         self.dx *= -1
-        self.dx += 1 #random.choice((0, 1))
         self.rect.y -= self.dy
         self.dy *= -1
-        self.dy += 1 #random.choice((0, 1))
 
 class Square(pygame.sprite.Sprite):
-    def __init__(self, lane: str, plot: int, sq_angle: float) -> None:
-        super().__init__()
-        
+    def __init__(self, lane: str, plot: int, sq_angle: int) -> None:
+        super().__init__()        
         # Loading Sprite
-        self.image = pygame.image.load(r"Game\img\square\square.png")
+        self.image = pygame.image.load(abs_path + r"\Game\img\square\square.png")
         
         # Changing Angle
         self.image = pygame.transform.rotate(surface=self.image, angle=sq_angle).convert_alpha()
         
         if lane == "right":
-            if plot == 0: self.rect = self.image.get_rect(midbottom=(display_width-100, (display_height-30)/6))
-            if plot == 1: self.rect = self.image.get_rect(midbottom=(display_width-100, (display_height-30)/3))
-            if plot == 2: self.rect = self.image.get_rect(midbottom=(display_width-100, (display_height-30)/2))
-            if plot == 3: self.rect = self.image.get_rect(midbottom=(display_width-100, (display_height-30)/1.5))
-            if plot == 4: self.rect = self.image.get_rect(midbottom=(display_width-100, (display_height-30)/1.2))
-            if plot == 5: self.rect = self.image.get_rect(midbottom=(display_width-100, (display_height-30)))
+            if plot == 0: self.rect = self.image.get_rect(midbottom=(display_width/1.06, (display_height/1.0303030303)/6))
+            if plot == 1: self.rect = self.image.get_rect(midbottom=(display_width/1.06, (display_height/1.0303030303)/3))
+            if plot == 2: self.rect = self.image.get_rect(midbottom=(display_width/1.06, (display_height/1.0303030303)/2))
+            if plot == 3: self.rect = self.image.get_rect(midbottom=(display_width/1.06, (display_height/1.0303030303)/1.5))
+            if plot == 4: self.rect = self.image.get_rect(midbottom=(display_width/1.06, (display_height/1.0303030303)/1.2))
+            if plot == 5: self.rect = self.image.get_rect(midbottom=(display_width/1.06, (display_height/1.0303030303)))
         if lane == "left":
-            if plot == 0: self.rect = self.image.get_rect(midbottom=(100, (display_height-30)/6))
-            if plot == 1: self.rect = self.image.get_rect(midbottom=(100, (display_height-30)/3))
-            if plot == 2: self.rect = self.image.get_rect(midbottom=(100, (display_height-30)/2))
-            if plot == 3: self.rect = self.image.get_rect(midbottom=(100, (display_height-30)/1.5))
-            if plot == 4: self.rect = self.image.get_rect(midbottom=(100, (display_height-30)/1.2))
-            if plot == 5: self.rect = self.image.get_rect(midbottom=(100, (display_height-30)))   
+            if plot == 0: self.rect = self.image.get_rect(midbottom=(display_width-(display_width/1.06), (display_height/1.0303030303)/6))
+            if plot == 1: self.rect = self.image.get_rect(midbottom=(display_width-(display_width/1.06), (display_height/1.0303030303)/3))
+            if plot == 2: self.rect = self.image.get_rect(midbottom=(display_width-(display_width/1.06), (display_height/1.0303030303)/2))
+            if plot == 3: self.rect = self.image.get_rect(midbottom=(display_width-(display_width/1.06), (display_height/1.0303030303)/1.5))
+            if plot == 4: self.rect = self.image.get_rect(midbottom=(display_width-(display_width/1.06), (display_height/1.0303030303)/1.2))
+            if plot == 5: self.rect = self.image.get_rect(midbottom=(display_width-(display_width/1.06), (display_height/1.0303030303)))
 
 class Goal(pygame.sprite.Sprite):
     def __init__(self, coords: tuple) -> None:
         super().__init__()
         # Loading Goal
-        self.image = pygame.image.load(r"Game\img\goal\goal.png").convert_alpha()
+        self.image = pygame.image.load(abs_path + r"\Game\img\goal\goal.png").convert_alpha()
         self.rect = self.image.get_rect(center=coords)
     
 def displayScore() -> None:
-    score_surf = data_font.render(f"Score:", True, "#ffffff")
+    score_surf = data_font.render("Score:", True, "#ffffff")
     score_rect = score_surf.get_rect(center=(display_width/2, display_height/24))
     score2_surf = data_font.render(f"{score}", True, "#34febb")
-    score2_rect = score_surf.get_rect(center=((display_width/2)+27.5, display_height/14))
+    score2_rect = score_surf.get_rect(center=(display_width/1.94430379747, display_height/14))
     screen.blit(source=score_surf, dest=score_rect)
     screen.blit(source=score2_surf, dest=score2_rect)
     
@@ -100,11 +95,21 @@ def displayTimePlayed() -> None:
     global current_time
     current_time = pygame.time.get_ticks()//1000 - start_time
     text_surf = data_font.render("Time Played:", True, "#ffffff")
-    text_rect = text_surf.get_rect(center=(display_width/2, display_height-100))
+    text_rect = text_surf.get_rect(center=(display_width/2, display_height/1.10869565217))
     screen.blit(source=text_surf, dest=text_rect)
     time_surf = data_font.render(f"{current_time} sec", True, "#34febb")
-    time_rect = text_surf.get_rect(center=((display_width/2)+40, display_height-72.5))
+    time_rect = text_surf.get_rect(center=(display_width/1.92, display_height/1.07196029777))
     screen.blit(source=time_surf, dest=time_rect)
+
+def loadAsset(mode: str, coords: tuple, img_loc: str, font, fcolor, text: str) -> None:
+    if mode == "text":
+        asset = font.render(text, True, fcolor)
+        asset_rect = asset.get_rect(center=coords)
+        screen.blit(source=asset, dest=asset_rect)
+    if mode == "img":
+        asset = pygame.image.load(img_loc).convert_alpha()
+        asset_rect = asset.get_rect(center=coords)
+        screen.blit(source=asset,dest=asset_rect)
     
 if __name__ == "__main__":
     # Game initialization
@@ -135,20 +140,21 @@ if __name__ == "__main__":
     start_time = 0
     current_time = 0
     score = 0
+    fps = 120
     
     # Arduino initialization
     Ard = ardC.Ard()
     
     # Bg Music
     bg_music = pygame.mixer.Sound(abs_path + r"\Game\music\Beginning 2.mp3")
-    bg_music.set_volume(0.5) #0.5
+    bg_music.set_volume(0.5)
     bg_music.play(loops=(-1))
     bg_music_G = pygame.mixer.Sound(abs_path + r"\Game\music\Wait.mp3")
-    bg_music_G.set_volume(0.5) #0.5
+    bg_music_G.set_volume(0.5)
 
     #Intro Screen Assets
     logo_img = pygame.image.load(abs_path + r"\Game\img\player\_player.png").convert_alpha()
-    logo_rect = logo_img.get_rect(center=(display_width/2, 375))
+    logo_rect = logo_img.get_rect(center=(display_width/2, display_height/2.88))
     
     # Asset initialization
     player = pygame.sprite.GroupSingle()
@@ -171,17 +177,19 @@ if __name__ == "__main__":
                     bg_music.stop()
                     bg_music_G.play(loops=(-1))
                     
-                    # Starting Arduino thread
+                    # Starting Game
                     if Ard.arduino_connected:
+                        if not Ard.arduinoSerial.is_open: Ard.arduinoSerial.open()
                         time.sleep(1)
                         
-                        startArdgetDatathread = th.Thread(target=lambda: Ard.getData())
-                        startArdgetDatathread.daemon = True
-                        startArdgetDatathread.start()
+                        # Starting Arduino thread
+                        ArdgetDatathread = th.Thread(target=lambda: Ard.getData())
+                        ArdgetDatathread.daemon = True
+                        ArdgetDatathread.start()
                         
                         # Asset initialization
                         player.add(Player())
-                        goal.add(Goal(coords=(random.randint(300, display_width-300), random.randint(200, display_height-200))))
+                        goal.add(Goal(coords=(random.uniform(display_width/6.4, display_width-(display_width/6.4)), random.uniform(display_height/5.1, display_height-(display_height/5.1)))))
                         if Ard.arduino_data:
                             square.add(Square(lane=Ard.arduino_data[0], plot=Ard.arduino_data[1], sq_angle=Ard.arduino_data[2]))
                             Ard.arduino_data.clear()
@@ -202,10 +210,18 @@ if __name__ == "__main__":
             
             if game_active:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    game_active = False
+                    # Changing config
                     intro_state = True
+                    change_goal_state = False
+                    game_active = False
+                    start_time = 0
+                    current_time = 0
+                    score = 0
+                    
+                    # Stopping bg tasks
                     bg_music_G.stop()
                     bg_music.play()
+                    Ard.arduinoSerial.close()
                                             
         # Main Game
         if game_active:                        
@@ -213,7 +229,7 @@ if __name__ == "__main__":
             player.draw(surface=screen)
             player.update()
 
-            # asset_group initialization
+            # Square and Goal initialization
             square.draw(surface=screen)
             square.update()
             goal.draw(surface=screen)
@@ -233,58 +249,36 @@ if __name__ == "__main__":
             # Chaning Goal state
             if change_goal_state:
                 goal.empty()
-                goal.add(Goal(coords=(random.randint(400, display_width-400), random.randint(200, display_height-200))))
+                goal.add(Goal(coords=(random.uniform(display_width/6.4, display_width-(display_width/6.4)), random.uniform(display_height/5.1, display_height-(display_height/5.1)))))
                 change_goal_state = False
                 
         # Intro Screen
         else:
+            # Background
             screen.fill(color="#20242c")
             
             # Intro Screen
             if intro_state:
-                Intro = game_font.render("Square Bouncer!", True, "#6ee390")
-                Intro_rect = Intro.get_rect(center=(display_width/2, 200))
-                screen.blit(source=Intro, dest=Intro_rect)
-                
-                assetgrp_img = pygame.image.load(abs_path + r"\Game\img\game_icons.png").convert_alpha()
-                assetgrp_rect = assetgrp_img.get_rect(center=(display_width/2, display_height/2.3))
-                screen.blit(source=assetgrp_img,dest=assetgrp_rect)
-                
-                start_game_message = game_font.render("Press any key to continue", True, "#ffffff")
-                start_game_message_rect = start_game_message.get_rect(center=(display_width/2, display_height/1.4))
-                screen.blit(source=start_game_message, dest=start_game_message_rect)
-                
-                creator_name = italicD_font.render("By: M Vihaan, 8G", True, "#fe6b31")
-                creator_rect = creator_name.get_rect(bottomleft=(display_width-220, display_height-30))
-                screen.blit(source=creator_name, dest=creator_rect)
+                loadAsset(mode="text", coords=(display_width/2, display_height/5.4), img_loc=None, font=game_font, fcolor="#6ee390", text="Square Bouncer!")
+                loadAsset(mode="img", coords=(display_width/2, display_height/2.3), img_loc=abs_path+r"\Game\img\game_icons.png", font=None, fcolor=None, text=None)
+                loadAsset(mode="text", coords=(display_width/2, display_height/1.4), img_loc=None, font=game_font, fcolor="#ffffff", text="Press any key to continue")
+                loadAsset(mode="text", coords=(display_width/1.06666666667, display_height-(display_height/30)), img_loc=None, font=italicD_font, fcolor="#fe6b31", text="By: M Vihaan, 8G")
                 
             # Entering game screen
             else:
+                # Background
                 screen.fill(color="#20242c")
-                try_connection_message = game_font.render("Tried to connect with Arduino", True, "#2176ed")
-                try_connection_message_rect = try_connection_message.get_rect(center=(display_width/2, 150))
-                screen.blit(source=try_connection_message, dest=try_connection_message_rect)
+
+                loadAsset(mode="text", coords=(display_width/2, display_height/6.8), img_loc=None, font=game_font, fcolor="#2176ed", text="Tried to connect with Arduino")
 
                 if Ard.arduino_connected:
                     screen.blit(source=logo_img, dest=logo_rect)
-                    
-                    connected_message = game_font.render("Connected Successfully!", True, "#6ee390")
-                    connected_message_rect = connected_message.get_rect(center=(display_width/2, 600))
-                    screen.blit(source=connected_message, dest=connected_message_rect)
-
-                    start_game_message = game_font.render("Press spacebar to start", True, "#ffffff")
-                    start_game_message_rect = start_game_message.get_rect(center=(display_width/2, 700))
-                    screen.blit(source=start_game_message, dest=start_game_message_rect)
+                    loadAsset(mode="text", coords=(display_width/2, display_height/1.7), img_loc=None, font=game_font, fcolor="#6ee390", text="Connected Successfully!")
+                    loadAsset(mode="text", coords=(display_width/2, display_height/1.45714285714), img_loc=None, font=game_font, fcolor="#ffffff", text="Press spacebar to start")
                 else:
                     screen.blit(source=logo_img, dest=logo_rect)
-                    
-                    connected_message = game_font.render("Couldnt Connect to Arduino!", True, "#ff0000")
-                    connected_message_rect = connected_message.get_rect(center=(display_width/1.5, 600))
-                    screen.blit(source=connected_message, dest=connected_message_rect)
-
-                    exit_game_message = game_font.render("Press any key to exit", True, "#ffffff")
-                    exit_game_message_rect = exit_game_message.get_rect(center=(display_width/2, 700))
-                    screen.blit(source=exit_game_message, dest=exit_game_message_rect)
+                    loadAsset(mode="text", coords=(display_width/2, display_height/1.7), img_loc=None, font=game_font, fcolor="#6ee390", text="Couldnt Connect to Arduino!")
+                    loadAsset(mode="text", coords=(display_width/2, display_height/1.45714285714), img_loc=None, font=game_font, fcolor="#ffffff", text="Press any key to exit")
 
         pygame.display.update()
-        clock.tick(120)
+        clock.tick(fps)
