@@ -277,7 +277,7 @@ if __name__ == "__main__":
                     loadAsset(mode="text", coords=(display_width/2, display_height/1.45714285714), img_loc=None, font=game_font, fcolor="#ffffff", text="Press spacebar to start")
                 else:
                     screen.blit(source=logo_img, dest=logo_rect)
-                    loadAsset(mode="text", coords=(display_width/2, display_height/1.7), img_loc=None, font=game_font, fcolor="#6ee390", text="Couldnt Connect to Arduino!")
+                    loadAsset(mode="text", coords=(display_width/2, display_height/1.7), img_loc=None, font=game_font, fcolor="#FF0000", text="Couldnt Connect to Arduino!")
                     loadAsset(mode="text", coords=(display_width/2, display_height/1.45714285714), img_loc=None, font=game_font, fcolor="#ffffff", text="Press any key to exit")
 
         pygame.display.update()
