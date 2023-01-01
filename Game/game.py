@@ -55,12 +55,13 @@ class Player(pygame.sprite.Sprite):
 class Square(pygame.sprite.Sprite):
     def __init__(self, lane: str, plot: int, sq_angle: int) -> None:
         super().__init__()        
-        # Loading Sprite
+        # Loading Square
         self.image = pygame.image.load(abs_path + r"\Game\img\square\square.png")
         
         # Changing Angle
         self.image = pygame.transform.rotate(surface=self.image, angle=sq_angle).convert_alpha()
         
+        # Deploying the Square on the screen
         if lane == "right":
             if plot == 0: self.rect = self.image.get_rect(midbottom=(display_width/1.06, (display_height/1.0303030303)/6))
             if plot == 1: self.rect = self.image.get_rect(midbottom=(display_width/1.06, (display_height/1.0303030303)/3))
@@ -82,14 +83,26 @@ class Goal(pygame.sprite.Sprite):
         # Loading Goal
         self.image = pygame.image.load(abs_path + r"\Game\img\goal\goal.png").convert_alpha()
         self.rect = self.image.get_rect(center=coords)
-    
+        
+def loadAsset(mode: str, coords: tuple, img_loc: str, font, fcolor, text: str) -> None:
+    if mode == "text":
+        asset = font.render(text, True, fcolor)
+        asset_rect = asset.get_rect(center=coords)
+        screen.blit(source=asset, dest=asset_rect)
+    if mode == "img":
+        asset = pygame.image.load(img_loc).convert_alpha()
+        asset_rect = asset.get_rect(center=coords)
+        screen.blit(source=asset,dest=asset_rect)
+        
 def displayScore() -> None:
-    score_surf = data_font.render("Score:", True, "#ffffff")
+    """score_surf = data_font.render("Score:", True, "#ffffff")
     score_rect = score_surf.get_rect(center=(display_width/2, display_height/24))
-    score2_surf = data_font.render(f"{score}", True, "#34febb")
-    score2_rect = score_surf.get_rect(center=(display_width/1.94430379747, display_height/14))
+    score2_surf = data_font.render(f"{score}", True, "#34febb")"""
+    loadAsset(mode="text", coords=(display_width/2, display_height/24), img_loc=None, font=data_font, fcolor="#ffffff", text="Score:")
+    loadAsset(mode="text", coords=(display_width/2, display_height/14), img_loc=None, font=data_font, fcolor="#34febb", text=str(score))
+    """score2_rect = score_surf.get_rect(center=(display_width/1.94430379747, display_height/14))
     screen.blit(source=score_surf, dest=score_rect)
-    screen.blit(source=score2_surf, dest=score2_rect)
+    screen.blit(source=score2_surf, dest=score2_rect)"""
     
 def displayTimePlayed() -> None:
     global current_time
@@ -101,16 +114,6 @@ def displayTimePlayed() -> None:
     time_rect = text_surf.get_rect(center=(display_width/1.92, display_height/1.07196029777))
     screen.blit(source=time_surf, dest=time_rect)
 
-def loadAsset(mode: str, coords: tuple, img_loc: str, font, fcolor, text: str) -> None:
-    if mode == "text":
-        asset = font.render(text, True, fcolor)
-        asset_rect = asset.get_rect(center=coords)
-        screen.blit(source=asset, dest=asset_rect)
-    if mode == "img":
-        asset = pygame.image.load(img_loc).convert_alpha()
-        asset_rect = asset.get_rect(center=coords)
-        screen.blit(source=asset,dest=asset_rect)
-    
 if __name__ == "__main__":
     # Game initialization
     pygame.init()
@@ -151,10 +154,6 @@ if __name__ == "__main__":
     bg_music.play(loops=(-1))
     bg_music_G = pygame.mixer.Sound(abs_path + r"\Game\music\Wait.mp3")
     bg_music_G.set_volume(0.5)
-
-    #Intro Screen Assets
-    logo_img = pygame.image.load(abs_path + r"\Game\img\player\_player.png").convert_alpha()
-    logo_rect = logo_img.get_rect(center=(display_width/2, display_height/2.88))
     
     # Asset initialization
     player = pygame.sprite.GroupSingle()
@@ -167,17 +166,19 @@ if __name__ == "__main__":
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                # Stopping game
                 bg_music_G.stop()
                 pygame.quit()
                 sys.exit()
                                 
             if not game_active and not intro_state:
+                # Starting Game
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                     game_active = True
                     bg_music.stop()
                     bg_music_G.play(loops=(-1))
                     
-                    # Starting Game
+                    # Arduino detection
                     if Ard.arduino_connected:
                         if not Ard.arduinoSerial.is_open: Ard.arduinoSerial.open()
                         time.sleep(1)
@@ -194,20 +195,24 @@ if __name__ == "__main__":
                             square.add(Square(lane=Ard.arduino_data[0], plot=Ard.arduino_data[1], sq_angle=Ard.arduino_data[2]))
                             Ard.arduino_data.clear()
                         
+                        # Exit message initialization
                         exit_text = italicD_font.render("Press 'Esc' key to return to home screen", True, "#fe6b31")
                         exit_text_rect = exit_text.get_rect(center=(display_width/2, display_height/10))
                         
                         # Start Timer
                         start_time = pygame.time.get_ticks()//1000
                     
+                # Exitting game
                 if not Ard.arduino_connected:
                     if event.type == pygame.KEYDOWN:
                         pygame.quit()
                         sys.exit()
-                        
+            
+            # Exitting Welcome screen            
             if intro_state: 
                 if event.type == pygame.KEYDOWN: intro_state = False
             
+            # Resseting game
             if game_active:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     # Changing config
@@ -259,6 +264,7 @@ if __name__ == "__main__":
             
             # Intro Screen
             if intro_state:
+                # Displaying messages
                 loadAsset(mode="text", coords=(display_width/2, display_height/5.4), img_loc=None, font=game_font, fcolor="#6ee390", text="Square Bouncer!")
                 loadAsset(mode="img", coords=(display_width/2, display_height/2.3), img_loc=abs_path+r"\Game\img\game_icons.png", font=None, fcolor=None, text=None)
                 loadAsset(mode="text", coords=(display_width/2, display_height/1.4), img_loc=None, font=game_font, fcolor="#ffffff", text="Press any key to continue")
@@ -267,16 +273,15 @@ if __name__ == "__main__":
             # Entering game screen
             else:
                 # Background
-                screen.fill(color="#20242c")
+                screen.fill(color="#20242c")                
+                loadAsset(mode="img", coords=(display_width/2, display_height/2.88), img_loc=abs_path+r"\Game\img\player\_player.png", font=None, fcolor=None, text=None)
 
+                # Displaying messages
                 loadAsset(mode="text", coords=(display_width/2, display_height/6.8), img_loc=None, font=game_font, fcolor="#2176ed", text="Tried to connect with Arduino")
-
                 if Ard.arduino_connected:
-                    screen.blit(source=logo_img, dest=logo_rect)
                     loadAsset(mode="text", coords=(display_width/2, display_height/1.7), img_loc=None, font=game_font, fcolor="#6ee390", text="Connected Successfully!")
                     loadAsset(mode="text", coords=(display_width/2, display_height/1.45714285714), img_loc=None, font=game_font, fcolor="#ffffff", text="Press spacebar to start")
                 else:
-                    screen.blit(source=logo_img, dest=logo_rect)
                     loadAsset(mode="text", coords=(display_width/2, display_height/1.7), img_loc=None, font=game_font, fcolor="#FF0000", text="Couldnt Connect to Arduino!")
                     loadAsset(mode="text", coords=(display_width/2, display_height/1.45714285714), img_loc=None, font=game_font, fcolor="#ffffff", text="Press any key to exit")
 
