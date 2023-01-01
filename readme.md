@@ -6,6 +6,7 @@
 * [Arduino IDE Download](https://www.arduino.cc/en/software)
 
 ## Required additional dependencies:
+****No need of installing the below if you are using the venv provided***
 * [pygame](https://pypi.org/project/pygame/)
 * [pyserial](https://pypi.org/project/pyserial/)
 
