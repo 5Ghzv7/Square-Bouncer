@@ -5,15 +5,16 @@ void setup() {
     Serial.begin(115200);
 
     // Setting all buttons to LOW state
-    for (byte i = 0; i <= 12;) {
-        pinMode(buttons[i], LOW);
-        i++;
+    for (byte i = 0; i <= 12; i++) {
+        pinMode(buttons[i], INPUT);
+        digitalWrite(buttons[i], LOW);
     }
 }
 
 void getButtonState(byte button) {
     byte buttonState = digitalRead(button);
 
+    // Left Lane
     if (button < 6) {
         if (buttonState == 1) {
             Serial.print("left$$");
@@ -22,6 +23,8 @@ void getButtonState(byte button) {
             Serial.println("#");
         }
     }
+
+    // Right Lane
     else {
         if (buttonState == 1) {
             Serial.print("right$$");
@@ -34,7 +37,7 @@ void getButtonState(byte button) {
 
 void loop() {
     // put your main code here, to run repeatedly:
-    for (byte i = 0; i <= 12;) {
+    for (byte i = 0; i <= 12; i++) {
         getButtonState(buttons[i]);
     }
 }
