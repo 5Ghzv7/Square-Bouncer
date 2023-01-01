@@ -39,9 +39,8 @@ class Ard:
                     dataPacket = list(dataPacket.split("$$"))
                     dataPacket[0] = str(dataPacket[0])
                     dataPacket[1] = int(dataPacket[1])
-                    dataPacket[2] = int(dataPacket[2])
                     self.arduino_data = dataPacket
-                    print(f"Input -> lane: {self.arduino_data[0]}, plot: {self.arduino_data[1]}, angle: {self.arduino_data[2]}")
+                    print(f"Input -> lane: {self.arduino_data[0]}, plot: {self.arduino_data[1]}")
             except IndexError:
                 print("Stopped receiving input!")
                 break

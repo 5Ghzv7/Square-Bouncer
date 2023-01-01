@@ -53,13 +53,10 @@ class Player(pygame.sprite.Sprite):
         self.dy *= -1
 
 class Square(pygame.sprite.Sprite):
-    def __init__(self, lane: str, plot: int, sq_angle: int) -> None:
+    def __init__(self, lane: str, plot: int) -> None:
         super().__init__()        
         # Loading Square
         self.image = pygame.image.load(abs_path + r"\Game\img\square\square.png")
-        
-        # Changing Angle
-        self.image = pygame.transform.rotate(surface=self.image, angle=sq_angle).convert_alpha()
         
         # Deploying the Square on the screen
         if lane == "right":
@@ -95,14 +92,8 @@ def loadAsset(mode: str, coords: tuple, img_loc: str, font, fcolor, text: str) -
         screen.blit(source=asset,dest=asset_rect)
         
 def displayScore() -> None:
-    """score_surf = data_font.render("Score:", True, "#ffffff")
-    score_rect = score_surf.get_rect(center=(display_width/2, display_height/24))
-    score2_surf = data_font.render(f"{score}", True, "#34febb")"""
     loadAsset(mode="text", coords=(display_width/2, display_height/24), img_loc=None, font=data_font, fcolor="#ffffff", text="Score:")
     loadAsset(mode="text", coords=(display_width/2, display_height/14), img_loc=None, font=data_font, fcolor="#34febb", text=str(score))
-    """score2_rect = score_surf.get_rect(center=(display_width/1.94430379747, display_height/14))
-    screen.blit(source=score_surf, dest=score_rect)
-    screen.blit(source=score2_surf, dest=score2_rect)"""
     
 def displayTimePlayed() -> None:
     global current_time
@@ -192,7 +183,7 @@ if __name__ == "__main__":
                         player.add(Player())
                         goal.add(Goal(coords=(random.uniform(display_width/6.4, display_width-(display_width/6.4)), random.uniform(display_height/5.1, display_height-(display_height/5.1)))))
                         if Ard.arduino_data:
-                            square.add(Square(lane=Ard.arduino_data[0], plot=Ard.arduino_data[1], sq_angle=Ard.arduino_data[2]))
+                            square.add(Square(lane=Ard.arduino_data[0], plot=Ard.arduino_data[1]))
                             Ard.arduino_data.clear()
                         
                         # Exit message initialization
@@ -248,7 +239,7 @@ if __name__ == "__main__":
             # Changing Square State
             if Ard.arduino_data:
                 square.empty()
-                square.add(Square(lane=Ard.arduino_data[0], plot=Ard.arduino_data[1], sq_angle=Ard.arduino_data[2]))
+                square.add(Square(lane=Ard.arduino_data[0], plot=Ard.arduino_data[1]))
                 Ard.arduino_data.clear()
             
             # Chaning Goal state
