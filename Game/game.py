@@ -1,6 +1,5 @@
 import pygame
-import sys
-import pathlib
+import sys, os
 import random
 import threading as th
 import time
@@ -10,7 +9,7 @@ import arduinoConfig as ardC
 class Player(pygame.sprite.Sprite):
     def __init__(self) -> None:
         super().__init__()
-        self.image = pygame.image.load(abs_path + r"\Game\img\player\player.png").convert_alpha()
+        self.image = pygame.image.load(os.path.realpath(r".\Game\img\player\player.png")).convert_alpha()
         self.rect = self.image.get_rect(center=(random.uniform(display_width/6.4, display_width-(display_width/6.4)), random.uniform(display_height/5.4, display_height-(display_height/5.4))))
         
         rand_xy = random.choice((2, -2))
@@ -56,7 +55,7 @@ class Square(pygame.sprite.Sprite):
     def __init__(self, lane: str, plot: int) -> None:
         super().__init__()        
         # Loading Square
-        self.image = pygame.image.load(abs_path + r"\Game\img\square\square.png")
+        self.image = pygame.image.load(os.path.realpath(r".\Game\img\square\square.png"))
         
         # Deploying the Square on the screen
         if lane == "right":
@@ -78,7 +77,7 @@ class Goal(pygame.sprite.Sprite):
     def __init__(self, coords: tuple) -> None:
         super().__init__()
         # Loading Goal
-        self.image = pygame.image.load(abs_path + r"\Game\img\goal\goal.png").convert_alpha()
+        self.image = pygame.image.load(os.path.realpath(r".\Game\img\goal\goal.png")).convert_alpha()
         self.rect = self.image.get_rect(center=coords)
         
 def loadAsset(mode: str, coords: tuple, img_loc: str, font, fcolor, text: str) -> None:
@@ -115,16 +114,13 @@ if __name__ == "__main__":
     display_height = display_dimensions.current_h
     screen = pygame.display.set_mode((display_width, display_height-60))
     display_width, display_height = screen.get_size()
-    
-    # Absolute Path
-    abs_path = str(pathlib.Path().absolute())
 
     # Intro Screen Assets
-    pygame.display.set_icon(pygame.image.load(abs_path + r"\Game\img\player\player.png"))
+    pygame.display.set_icon(pygame.image.load(os.path.realpath(r".\Game\img\player\player.png")))
     pygame.display.set_caption("Square Bouncer")
-    game_font = pygame.font.Font(abs_path + r"\Game\font\CascadiaCodePL-SemiBold.ttf", 50)
-    data_font = pygame.font.Font(abs_path + r"\Game\font\CascadiaCodePL-SemiBold.ttf", 25)
-    italicD_font = pygame.font.Font(abs_path + r"\Game\font\CascadiaCode-SemiBoldItalic.ttf", 20)
+    game_font = pygame.font.Font(os.path.realpath(r".\Game\font\CascadiaCodePL-SemiBold.ttf"), 50)
+    data_font = pygame.font.Font(os.path.realpath(r".\Game\font\CascadiaCodePL-SemiBold.ttf"), 25)
+    italicD_font = pygame.font.Font(os.path.realpath(r".\Game\font\CascadiaCode-SemiBoldItalic.ttf"), 20)
 
     # Config
     clock = pygame.time.Clock()
@@ -140,10 +136,10 @@ if __name__ == "__main__":
     Ard = ardC.Ard()
     
     # Bg Music
-    bg_music = pygame.mixer.Sound(abs_path + r"\Game\music\Beginning 2.mp3")
+    bg_music = pygame.mixer.Sound(os.path.realpath(r"Game\music\Beginning 2.mp3"))
     bg_music.set_volume(0.5)
     bg_music.play(loops=(-1))
-    bg_music_G = pygame.mixer.Sound(abs_path + r"\Game\music\Wait.mp3")
+    bg_music_G = pygame.mixer.Sound(os.path.realpath(r"Game\music\Wait.mp3"))
     bg_music_G.set_volume(0.5)
     
     # Asset initialization
@@ -257,7 +253,7 @@ if __name__ == "__main__":
             if intro_state:
                 # Displaying messages
                 loadAsset(mode="text", coords=(display_width/2, display_height/5.4), img_loc=None, font=game_font, fcolor="#6ee390", text="Square Bouncer!")
-                loadAsset(mode="img", coords=(display_width/2, display_height/2.3), img_loc=abs_path+r"\Game\img\game_icons.png", font=None, fcolor=None, text=None)
+                loadAsset(mode="img", coords=(display_width/2, display_height/2.3), img_loc=os.path.realpath(r".\Game\img\Game_icons.png"), font=None, fcolor=None, text=None)
                 loadAsset(mode="text", coords=(display_width/2, display_height/1.4), img_loc=None, font=game_font, fcolor="#ffffff", text="Press any key to continue")
                 loadAsset(mode="text", coords=(display_width/1.06666666667, display_height-(display_height/30)), img_loc=None, font=italicD_font, fcolor="#fe6b31", text="By: M Vihaan, 8G")
                 
@@ -265,7 +261,7 @@ if __name__ == "__main__":
             else:
                 # Background
                 screen.fill(color="#20242c")                
-                loadAsset(mode="img", coords=(display_width/2, display_height/2.88), img_loc=abs_path+r"\Game\img\player\_player.png", font=None, fcolor=None, text=None)
+                loadAsset(mode="img", coords=(display_width/2, display_height/2.88), img_loc=os.path.realpath(r".\Game\img\player\_player.png"), font=None, fcolor=None, text=None)
 
                 # Displaying messages
                 loadAsset(mode="text", coords=(display_width/2, display_height/6.8), img_loc=None, font=game_font, fcolor="#2176ed", text="Tried to connect with Arduino")
