@@ -2,9 +2,9 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
 
-  for (byte i = 0; i <= 12;) {
-    pinMode(buttons[i], LOW);
-  }
+//  for (byte i = 0; i <= 12;) {
+//    pinMode(buttons[i], LOW);
+//  }
 }
 
 void loop() {

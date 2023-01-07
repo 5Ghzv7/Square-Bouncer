@@ -1,5 +1,5 @@
 import pygame
-import sys
+import sys, os
 import random
 import threading as th
 import time
@@ -7,7 +7,9 @@ import time
 class Player(pygame.sprite.Sprite):
     def __init__(self) -> None:
         super().__init__()
-        self.image = pygame.image.load(r"Game\img\player\player.png").convert_alpha()
+        # Loading Player
+        self.image = pygame.image.load(rf"{game_path}\img\player.png")
+        self.image = pygame.transform.smoothscale(surface=self.image, size=(display_width/30, display_height/15.9375)).convert_alpha()
         self.rect = self.image.get_rect(center=(random.uniform(display_width/6.4, display_width-(display_width/6.4)), random.uniform(display_height/5.4, display_height-(display_height/5.4))))
         
         rand_xy = random.choice((2, -2))
@@ -51,9 +53,10 @@ class Player(pygame.sprite.Sprite):
 
 class Square(pygame.sprite.Sprite):
     def __init__(self, lane: str, plot: int) -> None:
-        super().__init__()        
+        super().__init__()
         # Loading Square
-        self.image = pygame.image.load(r"Game\img\square\square.png")
+        self.image = pygame.image.load(rf"{game_path}\img\square.png")
+        self.image = pygame.transform.smoothscale(surface=self.image, size=(display_width/15, display_height/7.96875)).convert_alpha()
         
         # Deploying the Square on the screen
         if lane == "right":
@@ -75,22 +78,24 @@ class Goal(pygame.sprite.Sprite):
     def __init__(self, coords: tuple) -> None:
         super().__init__()
         # Loading Goal
-        self.image = pygame.image.load(r"Game\img\goal\goal.png").convert_alpha()
+        self.image = pygame.image.load(rf"{game_path}\img\goal.png")
+        self.image = pygame.transform.smoothscale(surface=self.image, size=(display_width/30, display_height/13.7837837838)).convert_alpha()
         self.rect = self.image.get_rect(center=coords)
         
-def loadAsset(mode: str, coords: tuple, img_loc: str, font, fcolor, text: str) -> None:
+def loadAsset(mode: str, coords: tuple, img_loc: str, font, fcolor, text: str, size: tuple) -> None:
     if mode == "text":
         asset = font.render(text, True, fcolor)
         asset_rect = asset.get_rect(center=coords)
         screen.blit(source=asset, dest=asset_rect)
     if mode == "img":
         asset = pygame.image.load(img_loc).convert_alpha()
+        if size != (None): asset = pygame.transform.smoothscale(surface=asset, size=size).convert_alpha()
         asset_rect = asset.get_rect(center=coords)
         screen.blit(source=asset,dest=asset_rect)
         
 def displayScore() -> None:
-    loadAsset(mode="text", coords=(display_width/2, display_height/24), img_loc=None, font=data_font, fcolor="#ffffff", text="Score:")
-    loadAsset(mode="text", coords=(display_width/2, display_height/14), img_loc=None, font=data_font, fcolor="#34febb", text=str(score))
+    loadAsset(mode="text", coords=(display_width/2, display_height/24), img_loc=None, font=data_font, fcolor="#ffffff", text="Score:", size=(None))
+    loadAsset(mode="text", coords=(display_width/2, display_height/14), img_loc=None, font=data_font, fcolor="#34febb", text=str(score), size=(None))
     
 def displayTimePlayed() -> None:
     global current_time
@@ -117,7 +122,7 @@ def simulateData() -> None:
                     data.clear()
                     data.append("left")
                     data.append(j)
-                    print(f"Simulated Input -> lane: {data[0]}, plot: {data[1]}")     
+                    print(f"Simulated Input -> lane: {data[0]}, plot: {data[1]}")
 
 if __name__ == "__main__":
     # Game initialization
@@ -130,13 +135,16 @@ if __name__ == "__main__":
     screen = pygame.display.set_mode((display_width, display_height-60))
     display_width, display_height = screen.get_size()
 
+    # Game Path
+    game_path = os.path.dirname(__file__)
+
     # Intro Screen Assets
-    pygame.display.set_icon(pygame.image.load(r"Game\img\player\player.png"))
+    pygame.display.set_icon(pygame.image.load(rf"{game_path}\img\player.png"))
     pygame.display.set_caption("Square Bouncer")
-    game_font = pygame.font.Font(r"Game\font\CascadiaCodePL-SemiBold.ttf", 50)
-    data_font = pygame.font.Font(r"Game\font\CascadiaCodePL-SemiBold.ttf", 25)
-    italicD_font = pygame.font.Font(r"Game\font\CascadiaCode-SemiBoldItalic.ttf", 20)
-    warning_font = pygame.font.Font(r"Game\font\CascadiaCode-SemiBoldItalic.ttf", 50)
+    game_font = pygame.font.Font(rf"{game_path}\font\CascadiaCodePL-SemiBold.ttf", int(display_width/38.4))
+    data_font = pygame.font.Font(rf"{game_path}\font\CascadiaCodePL-SemiBold.ttf", int(display_width/76.8))
+    italicD_font = pygame.font.Font(rf"{game_path}\font\CascadiaCode-SemiBoldItalic.ttf", int(display_width/96))
+    warning_font = pygame.font.Font(rf"{game_path}\font\CascadiaCode-SemiBoldItalic.ttf", int(display_width/38.4))
 
     # Config
     clock = pygame.time.Clock()
@@ -147,14 +155,14 @@ if __name__ == "__main__":
     start_time = 0
     current_time = 0
     score = 0
-    fps = 120
+    fps = display_width/16
     data = []
     
     # Bg Music
-    bg_music = pygame.mixer.Sound(r"Game\music\Beginning 2.mp3")
+    bg_music = pygame.mixer.Sound(rf"{game_path}\music\Beginning 2.mp3")
     bg_music.set_volume(0.25)
     bg_music.play(loops=(-1))
-    bg_music_G = pygame.mixer.Sound(r"Game\music\Wait.mp3")
+    bg_music_G = pygame.mixer.Sound(rf"{game_path}\music\Wait.mp3")
     bg_music_G.set_volume(0.25)
     
     # Asset initialization
@@ -259,21 +267,21 @@ if __name__ == "__main__":
             # Intro Screen
             if intro_state:
                 # Displaying messages
-                loadAsset(mode="text", coords=(display_width/2, display_height/5.4), img_loc=None, font=game_font, fcolor="#6ee390", text="Square Bouncer!")
-                loadAsset(mode="img", coords=(display_width/2, display_height/2.3), img_loc=r"Game\img\Game_icons.png", font=None, fcolor=None, text=None)
-                loadAsset(mode="text", coords=(display_width/2, display_height/1.4), img_loc=None, font=game_font, fcolor="#ffffff", text="Press any key to continue")
-                loadAsset(mode="text", coords=(display_width/1.06666666667, display_height-(display_height/30)), img_loc=None, font=italicD_font, fcolor="#fe6b31", text="By: M Vihaan, 8G")
+                loadAsset(mode="text", coords=(display_width/2, display_height/5.4), img_loc=None, font=game_font, fcolor="#6ee390", text="Square Bouncer!", size=(None))
+                loadAsset(mode="img", coords=(display_width/2, display_height/2.3), img_loc=rf"{game_path}\img\Game_icons.png", font=None, fcolor=None, text=None, size=(display_width/2.21709006928, display_height/3.54166666667))
+                loadAsset(mode="text", coords=(display_width/2, display_height/1.4), img_loc=None, font=game_font, fcolor="#ffffff", text="Press any key to continue", size=(None))
+                loadAsset(mode="text", coords=(display_width/1.06666666667, display_height-(display_height/30)), img_loc=None, font=italicD_font, fcolor="#fe6b31", text="By: M Vihaan, 8G", size=(None))
                 
             # Entering game screen
             else:
                 # Background
                 screen.fill(color="#20242c")                
-                loadAsset(mode="img", coords=(display_width/2, display_height/2.88), img_loc=r"Game\img\player\_player.png", font=None, fcolor=None, text=None)
+                loadAsset(mode="img", coords=(display_width/2, display_height/2.88), img_loc=rf"{game_path}\img\player.png", font=None, fcolor=None, text=None, size=(display_width/6.57534246575, display_height/3.49315068493))
 
                 # Displaying messages
-                loadAsset(mode="text", coords=(display_width/2, display_height/6.8), img_loc=None, font=game_font, fcolor="#ff0000", text="In Simulation mode...")
-                loadAsset(mode="text", coords=(display_width/2, display_height/1.7), img_loc=None, font=warning_font, fcolor="#fe6b31", text="Warning: Arduino signals will be simulated by the program!")
-                loadAsset(mode="text", coords=(display_width/2, display_height/1.45714285714), img_loc=None, font=game_font, fcolor="#ffffff", text="Press spacebar to start")
+                loadAsset(mode="text", coords=(display_width/2, display_height/6.8), img_loc=None, font=game_font, fcolor="#ff0000", text="In Simulation mode...", size=(None))
+                loadAsset(mode="text", coords=(display_width/2, display_height/1.7), img_loc=None, font=warning_font, fcolor="#fe6b31", text="Warning: Arduino signals will be simulated by the program!", size=(None))
+                loadAsset(mode="text", coords=(display_width/2, display_height/1.45714285714), img_loc=None, font=game_font, fcolor="#ffffff", text="Press spacebar to start", size=(None))
 
         pygame.display.update()
         clock.tick(fps)
