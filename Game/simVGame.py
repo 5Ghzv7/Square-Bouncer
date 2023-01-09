@@ -226,7 +226,12 @@ if __name__ == "__main__":
                     current_time = 0
                     score = 0
                     
-                    # Stopping bg music
+                    # Deleting Sprites
+                    goal.empty()
+                    player.empty()
+                    square.empty()
+                    
+                    # Stopping bg tasks
                     bg_music_G.stop()
                     bg_music.play()
                                             

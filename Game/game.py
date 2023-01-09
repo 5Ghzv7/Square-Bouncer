@@ -161,6 +161,7 @@ if __name__ == "__main__":
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 # Stopping game
+                Ard.arduinoSerial.close()
                 bg_music_G.stop()
                 pygame.quit()
                 sys.exit()
@@ -199,6 +200,8 @@ if __name__ == "__main__":
                 # Exitting game
                 if not Ard.arduino_connected:
                     if event.type == pygame.KEYDOWN:
+                        Ard.arduinoSerial.close()
+                        bg_music_G.stop()
                         pygame.quit()
                         sys.exit()
             
@@ -216,6 +219,11 @@ if __name__ == "__main__":
                     start_time = 0
                     current_time = 0
                     score = 0
+                    
+                    # Deleting Sprites
+                    goal.empty()
+                    player.empty()
+                    square.empty()
                     
                     # Stopping bg tasks
                     bg_music_G.stop()
